@@ -3,7 +3,7 @@
     border-width: 1px;
     border-style: solid;
     border-radius: 0px;
-    width: 100%;
+    width: calc(100% - 30px);
     cursor: pointer;
     z-index: 9999;
     position: absolute;
