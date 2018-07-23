@@ -1,27 +1,26 @@
 import { EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { map } from 'rxjs/operators/map';
+import { catchError } from 'rxjs/operators/catchError';
 
 import { CompleterBaseData } from './completer-base-data';
 import { CompleterItem } from '../components/completer-item';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 export class RemoteData extends CompleterBaseData {
     public dataSourceChange: EventEmitter<void> = new EventEmitter<void>();
 
-    private _remoteUrl: string;
+    private _remoteUrl: string | null;
     private remoteSearch: Subscription;
     private _urlFormater: ((term: string) => string) | null = null;
     private _dataField: string | null = null;
-    private _headers: HttpHeaders;
-
+    private _requestOptions: any;
 
     constructor(private http: HttpClient) {
         super();
     }
 
-    public remoteUrl(remoteUrl: string) {
+    public remoteUrl(remoteUrl: string | null) {
         this._remoteUrl = remoteUrl;
         this.dataSourceChange.emit();
 
@@ -36,11 +35,8 @@ export class RemoteData extends CompleterBaseData {
         this._dataField = dataField;
     }
 
-    /**
-     * @deprecated Please use the requestOptions to pass headers with the search request
-     */
-    public headers(headers: HttpHeaders) {
-        this._headers = headers;
+    public requestOptions(requestOptions: any) {
+        this._requestOptions = requestOptions;
     }
 
     public search(term: string): void {
@@ -53,25 +49,17 @@ export class RemoteData extends CompleterBaseData {
             url = this._remoteUrl + encodeURIComponent(term);
         }
 
-        /*
-         * If requestOptions are provided, they will override anything set in headers.
-         *
-         * If no requestOptions are provided, a new RequestOptions object will be instantiated,
-         * and either the provided headers or a new Headers() object will be sent.
-         */
-        if (!this._headers) {
-            this._headers = new HttpHeaders();
-        }
-
-        this.remoteSearch = this.http.get(url, { headers: this._headers})
-            .map((res: Object) => res)
-            .map((data: any) => {
-                let matches = this.extractValue(data, this._dataField);
-                return this.extractMatches(matches, term);
-            })
-            .catch(() => [])
+        this.remoteSearch = this.http
+            .get(url, Object.assign({}, this._requestOptions))
+            .pipe(
+                map((data: any) => {
+                    const matches = this.extractValue(data, this._dataField);
+                    return this.extractMatches(matches, term);
+                }),
+                catchError(() => [])
+            )
             .subscribe((matches: any[]) => {
-                let results = this.processResults(matches);
+                const results = this.processResults(matches);
                 this.next(results);
             });
     }

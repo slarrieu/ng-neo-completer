@@ -8,8 +8,8 @@ import { CompleterListItemCmp } from './components/completer-list-item-cmp';
 import { CompleterService } from './services/completer-service';
 import { NeoCompleterService } from './neo.completer.service';
 
-import { localDataFactory, remoteDataFactory,
-   LocalDataFactoryProvider, RemoteDataFactoryProvider } from './services/completer-data-factory';
+import { LocalDataFactory } from './services/local-data-factory';
+import { RemoteDataFactory } from './services/remote-data-factory';
 import { CtrCompleter } from './directives/ctr-completer';
 import { CtrDropdown } from './directives/ctr-dropdown';
 import { CtrInput } from './directives/ctr-input';
@@ -30,6 +30,8 @@ export * from './directives/ctr-list';
 export * from './directives/ctr-row';
 export * from './services/completer-data';
 export * from './services/completer-service';
+export * from './services/local-data-factory';
+export * from './services/remote-data-factory';
 export * from './neo.completer.service';
 
 export {CompleterData} from './services/completer-data';
@@ -63,7 +65,7 @@ export {CompleterBaseData} from './services/completer-base-data';
     CtrInput,
     CtrList,
     CtrRow
-  ]
+  ],
 })
 export class NeoCompleterModule {
   static forRoot(): ModuleWithProviders {
@@ -71,8 +73,8 @@ export class NeoCompleterModule {
       ngModule: NeoCompleterModule,
       providers: [
         CompleterService,
-        LocalDataFactoryProvider,
-        RemoteDataFactoryProvider,
+        LocalDataFactory,
+        RemoteDataFactory
       ]
     };
   }

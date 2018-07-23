@@ -1,17 +1,16 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
+import { catchError } from 'rxjs/operators/catchError';
 
 import { CompleterBaseData } from './completer-base-data';
 import { CompleterItem } from '../components/completer-item';
 
-@Injectable()
 export class LocalData extends CompleterBaseData {
 
     public dataSourceChange: EventEmitter<void> = new EventEmitter<void>();
 
-    private _data: any[];
-    private savedTerm: string | null;
+    protected _data: any[];
+    protected savedTerm: string | null;
 
     constructor() {
         super();
@@ -19,9 +18,9 @@ export class LocalData extends CompleterBaseData {
 
     public data(data: any[] | Observable<any[]>) {
         if (data instanceof Observable) {
-            const data$ = <Observable<any[]>>data;
+            const data$ = data as Observable<any[]>;
             data$
-                .catch(() => [])
+                .pipe(catchError(() => []))
                 .subscribe((res) => {
                     this._data = res;
                     if (this.savedTerm) {
@@ -30,7 +29,7 @@ export class LocalData extends CompleterBaseData {
                     this.dataSourceChange.emit();
                 });
         } else {
-            this._data = <any[]>data;
+            this._data = data;
         }
 
         this.dataSourceChange.emit();
@@ -43,7 +42,7 @@ export class LocalData extends CompleterBaseData {
             this.savedTerm = term;
         } else {
             this.savedTerm = null;
-            let matches: any[] = this.extractMatches(this._data, term);
+            const matches: any[] = this.extractMatches(this._data, term);
             this.next(this.processResults(matches));
         }
     }

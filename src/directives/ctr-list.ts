@@ -1,9 +1,7 @@
-import 'rxjs/add/observable/timer';
 import { ChangeDetectorRef, Directive, EmbeddedViewRef, Host, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/retryWhen';
-import 'rxjs/add/operator/do';
+import { timer } from 'rxjs/observable/timer';
+import { catchError, take } from 'rxjs/operators';
 
 import { CtrCompleter, CompleterList } from './ctr-completer';
 import { CompleterData } from '../services/completer-data';
@@ -91,7 +89,7 @@ export class CtrList implements OnInit, CompleterList {
             if (this.clearTimer) {
                 this.clearTimer.unsubscribe();
             }
-            this.searchTimer = Observable.timer(this.ctrListPause).subscribe(() => {
+            this.searchTimer = timer(this.ctrListPause).pipe(take(1)).subscribe(() => {
                 this.searchTimerComplete(term);
             });
         } else if (!isNil(term) && term.length < this.ctrListMinSearchLength) {
@@ -104,7 +102,7 @@ export class CtrList implements OnInit, CompleterList {
         if (this.searchTimer) {
             this.searchTimer.unsubscribe();
         }
-        this.clearTimer = Observable.timer(CLEAR_TIMEOUT).subscribe(() => {
+        this.clearTimer = timer(CLEAR_TIMEOUT).pipe(take(1)).subscribe(() => {
             this._clear();
         });
     }
@@ -150,7 +148,7 @@ export class CtrList implements OnInit, CompleterList {
                 this.templateRef,
                 this.ctx
             );
-        } else {
+        } else if (!this.viewRef.destroyed) {
             // refresh the template
             this.viewRef!.context.isOpen = this.ctx.isOpen;
             this.viewRef!.context.results = this.ctx.results;
@@ -182,12 +180,13 @@ export class CtrList implements OnInit, CompleterList {
 
     private dataServiceSubscribe() {
         if (this._dataService) {
-            this._dataService
-                .catch(err => {
+            this._dataService.pipe(
+                catchError(err => {
                     console.error(err);
                     console.error('Unexpected error in dataService: errors should be handled by the dataService Observable');
                     return [];
                 })
+            )
                 .subscribe(results => {
                     this.ctx.searchInitialized = true;
                     this.ctx.searching = false;

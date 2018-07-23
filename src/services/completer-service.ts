@@ -1,20 +1,25 @@
-import {Injectable, Inject} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import {LocalData} from './local-data';
-import {RemoteData} from './remote-data';
-
+import { LocalData } from './local-data';
+import { RemoteData } from './remote-data';
+import { LocalDataFactory } from './local-data-factory';
+import { RemoteDataFactory } from './remote-data-factory';
 
 @Injectable()
 export class CompleterService {
     constructor(
-        @Inject(LocalData) private localDataFactory: any, // Using any instead of () => LocalData because on AoT errors
-        @Inject(RemoteData) private remoteDataFactory: any // Using any instead of () => LocalData because on AoT errors
+        private localDataFactory: LocalDataFactory, // Using any instead of () => LocalData because of AoT errors
+        private remoteDataFactory: RemoteDataFactory // Using any instead of () => LocalData because of AoT errors
     ) { }
 
-    public local(data: any[] | Observable<any>, searchFields: string | null = '', titleField: string | null = ''): LocalData {
+    public local(
+        data: any[] | Observable<any>,
+        searchFields: string | null = '',
+        titleField: string | null = ''
+    ): LocalData {
 
-        let localData = this.localDataFactory();
+        const localData = this.localDataFactory.create();
         return localData
             .data(data)
             .searchFields(searchFields)
@@ -23,7 +28,7 @@ export class CompleterService {
 
     public remote(url: string | null, searchFields: string | null = '', titleField: string | null = ''): RemoteData {
 
-        let remoteData = this.remoteDataFactory();
+        const remoteData = this.remoteDataFactory.create();
         return remoteData
             .remoteUrl(url)
             .searchFields(searchFields)

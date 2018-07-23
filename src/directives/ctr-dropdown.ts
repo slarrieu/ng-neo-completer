@@ -61,7 +61,6 @@ export class CtrDropdown implements CompleterDropdown, OnDestroy, AfterViewInit 
         } else {
             this._rowMouseDown = false;
         }
-        
     }
 
     public registerRow(row: CtrRowItem) {
