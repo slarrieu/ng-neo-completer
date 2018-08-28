@@ -1,6 +1,6 @@
 {
   "name": "ng-neo-completer",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "scripts": {
     "build": "gulp build",
     "build:watch": "gulp",
@@ -23,7 +23,11 @@
     "email": "info@neocomplexx.com"
   },
   "keywords": [
-    "angular", "auto","completer","autocompleter","object"
+    "angular",
+    "auto",
+    "completer",
+    "autocompleter",
+    "object"
   ],
   "license": "MIT",
   "bugs": {

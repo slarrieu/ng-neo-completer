@@ -35,6 +35,7 @@ export class CtrInput {
     @Input('openOnClick') public openOnClick = false;
     @Input('selectOnClick') public selectOnClick = false;
     @Input('selectOnFocus') public selectOnFocus = false;
+    @Input('autoSelectOnEnter') public autoSelectOnEnter = false;
 
     @Output() public ngModelChange: EventEmitter<any> = new EventEmitter();
 
@@ -118,6 +119,12 @@ export class CtrInput {
         if (keyCode === KEY_EN) {
             if (this.completer.hasHighlighted()) {
                 event.preventDefault();
+            }else{
+                if (this.autoSelectOnEnter){
+                    event.preventDefault();
+                    this.completer.open();
+                    this.completer.nextRow();
+                }
             }
             this.handleSelection();
         } else if (keyCode === KEY_DW) {
