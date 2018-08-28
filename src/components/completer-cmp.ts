@@ -92,7 +92,7 @@ export class CompleterCmp implements OnInit, ControlValueAccessor, AfterViewChec
     @Input() public selectOnClick = false;
     @Input() public initialValue: any;
     @Input() public autoHighlight = false;
-    @Input() public autoSelectOnEnter = false;
+    @Input() public autoSelectOnEnter = true;
 
     @Output() public selected = new EventEmitter<CompleterItem>();
     @Output() public highlighted = new EventEmitter<CompleterItem>();

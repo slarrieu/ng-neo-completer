@@ -35,7 +35,7 @@ export class CtrInput {
     @Input('openOnClick') public openOnClick = false;
     @Input('selectOnClick') public selectOnClick = false;
     @Input('selectOnFocus') public selectOnFocus = false;
-    @Input('autoSelectOnEnter') public autoSelectOnEnter = false;
+    @Input('autoSelectOnEnter') public autoSelectOnEnter = true;
 
     @Output() public ngModelChange: EventEmitter<any> = new EventEmitter();
 
